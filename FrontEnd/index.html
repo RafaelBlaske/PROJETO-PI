@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Confeitaria</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #fff0f5;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      .navbar {
+        background-color: #ffe4e1 !important;
+      }
+
+      .navbar-brand,
+      .nav-link {
+        color: #d63384 !important;
+        font-weight: bold;
+      }
+
+      .btn-outline-primary {
+        border-color: #d63384;
+        color: #d63384;
+      }
+
+      .btn-outline-primary:hover {
+        background-color: #d63384;
+        color: #fff;
+      }
+
+      .btn-primary {
+        background-color: #d63384;
+        border-color: #d63384;
+      }
+
+      .btn-primary:hover {
+        background-color: #c2185b;
+        border-color: #c2185b;
+      }
+
+      .btn-success {
+        background-color: #e91e63;
+        border-color: #e91e63;
+      }
+
+      .btn-success:hover {
+        background-color: #c2185b;
+        border-color: #c2185b;
+      }
+
+      .produto-img {
+        width: 100%;
+        height: auto;
+        max-height: 200px;
+        object-fit: cover;
+        border-radius: 8px 8px 0 0;
+      }
+
+      footer {
+        background-color: #ffe4e1;
+        padding: 20px;
+        text-align: center;
+        color: #d63384;
+        margin-top: auto;
+      }
+
+      .card {
+        border: 1px solid #f8bbd0;
+        border-radius: 8px;
+        box-shadow: 1px 1px 5px rgba(214, 51, 132, 0.3);
+      }
+
+      .card-title {
+        color: #d63384;
+        font-weight: bold;
+      }
+
+      .card-text {
+        color: #555;
+      }
+
+      .container {
+        flex-grow: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-light">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">Confeitaria</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                href="#"
+                onclick="mostrarCategorias()"
+                >Produtos</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="mostrarCarrinho()">Carrinho</a>
+            </li>
+            <li class="nav-item"><a class="nav-link" href="#">Sobre Nós</a></li>
+            <li class="nav-item">
+              <a class="nav-link" href="./contato.html">Contato</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Container categorias com botões Bolos e Doces -->
+    <div class="container mt-3" id="categoriasContainer" style="display:none;"></div>
+
+    <!-- Container produtos para exibir produtos após clicar em categoria -->
+    <div class="container mt-3" id="produtosContainer"></div>
+
+    <!-- Container carrinho -->
+    <div class="container mt-3" id="carrinhoContainer" style="display:none;">
+      <h3 style="color: #d63384;">Carrinho</h3>
+      <ul id="listaCarrinho" class="list-group mb-3"></ul>
+      <p><strong>Total:</strong> R$ <span id="totalCarrinho">0.00</span></p>
+      <button class="btn btn-success" onclick="realizarPedido()">
+        Realizar Pedido
+      </button>
+    </div>
+
+    <footer>
+      <p>&copy; 2025 Confeitaria. Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+      const produtos = {
+        bolos: [
+          { Nome: "Bolo de Chocolate", Preco: 95.0, ImagemURL: "chocolate.jpg" },
+          { Nome: "Bolo de Abacaxi", Preco: 90.0, ImagemURL: "branco.jpg" },
+          { Nome: "Bolo Kit Kat com confetes", Preco: 75.0, ImagemURL: "bolo de mm.jpg" },
+          { Nome: "Bolo de Abacaxi com coco", Preco: 100.0, ImagemURL: "palmeiras.jpg" },
+          { Nome: "Bolo de Prestígio", Preco: 115.0, ImagemURL: "bolo de desenho.jpg" },
+          { Nome: "Bolo de mousse de chocolate com morangos", Preco: 125.0, ImagemURL: "murango.jpg" }
+        ],
+        doces: [
+          { Nome: "Brigadeiro Tradicional", Preco: 2.5, ImagemURL: "brisadeiro.jpg" },
+          { Nome: "Beijinho", Preco: 2.5, ImagemURL: "beijinho.jpg" },
+          { Nome: "Brigadeiros Personalizados", Preco: 4.0, ImagemURL: "rosa.jpg" },
+          { Nome: "Pote da Felicidade (Bis)", Preco: 7.5, ImagemURL: "pote.jpg" },
+          { Nome: "Pote da Felicidade (Uva)", Preco: 7.5, ImagemURL: "uva.jpg" }
+        ]
+      };
+
+      let carrinho = [];
+
+      // Mostrar a seção categorias com os botões Bolos e Doces
+      function mostrarCategorias() {
+        document.getElementById("categoriasContainer").style.display = "block";
+        document.getElementById("produtosContainer").innerHTML = "";
+        document.getElementById("carrinhoContainer").style.display = "none";
+
+        const container = document.getElementById("categoriasContainer");
+        container.innerHTML = `
+          <div class="btn-group" role="group">
+            <button class="btn btn-outline-primary" onclick="mostrarProdutos('bolos')">Bolos</button>
+            <button class="btn btn-outline-primary" onclick="mostrarProdutos('doces')">Doces</button>
+          </div>
+        `;
+      }
+
+      // Mostrar os produtos da categoria selecionada
+      function mostrarProdutos(tipo) {
+        const container = document.getElementById("produtosContainer");
+        const categorias = document.getElementById("categoriasContainer");
+        categorias.style.display = "none"; // Esconde os botões de categoria após escolher
+
+        const listaProdutos = produtos[tipo];
+
+        if (!listaProdutos) {
+          container.innerHTML = "<p>Categoria não encontrada.</p>";
+          return;
+        }
+
+        let html = `<h3 style="color: #d63384; margin-bottom: 20px;">${
+          tipo.charAt(0).toUpperCase() + tipo.slice(1)
+        }</h3><div class="row">`;
+
+        listaProdutos.forEach((produto) => {
+          html += `
+            <div class="col-sm-6 col-md-4 mb-3">
+              <div class="card">
+                <img src="${produto.ImagemURL}" class="card-img-top produto-img" alt="${produto.Nome}">
+                <div class="card-body">
+                  <h5 class="card-title">${produto.Nome}</h5>
+                  <p class="card-text fw-bold">R$ ${produto.Preco.toFixed(2)}</p>
+                  <button class="btn btn-primary" onclick='adicionarAoCarrinho(${JSON.stringify(
+                    produto
+                  )})'>Adicionar ao Carrinho</button>
+                </div>
+              </div>
+            </div>`;
+        });
+
+        html += "</div>";
+        container.innerHTML = html;
+        document.getElementById("carrinhoContainer").style.display = "none";
+      }
+
+      // Adicionar produto ao carrinho
+      function adicionarAoCarrinho(produto) {
+        carrinho.push(produto);
+        alert(produto.Nome + " adicionado ao carrinho!");
+      }
+
+      // Mostrar o carrinho
+      function mostrarCarrinho() {
+        document.getElementById("categoriasContainer").style.display = "none";
+        document.getElementById("produtosContainer").innerHTML = "";
+        document.getElementById("carrinhoContainer").style.display = "block";
+
+        const lista = document.getElementById("listaCarrinho");
+        const total = document.getElementById("totalCarrinho");
+        let soma = 0;
+        lista.innerHTML = "";
+
+        carrinho.forEach((p) => {
+          soma += parseFloat(p.Preco);
+          const item = document.createElement("li");
+          item.classList.add("list-group-item");
+          item.textContent = p.Nome + " - R$ " + parseFloat(p.Preco).toFixed(2);
+          lista.appendChild(item);
+        });
+
+        total.textContent = soma.toFixed(2);
+      }
+
+      // Função fictícia para realizar pedido (sem backend)
+      function realizarPedido() {
+        if (carrinho.length === 0) {
+          alert("Seu carrinho está vazio.");
+          return;
+        }
+        alert("Pedido realizado com sucesso!");
+        carrinho = [];
+        mostrarCarrinho();
+      }
+    </script>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>
+
