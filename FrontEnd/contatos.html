@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contatos - Confeitaria</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #fff0f5;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .navbar {
+        background-color: #ffe4e1 !important;
+      }
+
+      .navbar-brand {
+        color: #d63384 !important;
+        font-weight: bold;
+      }
+
+      .container {
+        padding-top: 30px;
+        padding-bottom: 30px;
+        flex-grow: 1;
+      }
+
+      .card {
+        border-color: #ffc0cb;
+        box-shadow: 0 4px 8px rgba(214, 51, 132, 0.1);
+        margin-bottom: 20px;
+      }
+
+      .card-title {
+        color: #d63384;
+        font-weight: bold;
+      }
+
+      .card-text {
+        color: #555;
+      }
+
+      footer {
+        background-color: #ffe4e1;
+        padding: 20px;
+        text-align: center;
+        color: #d63384;
+        margin-top: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-light">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="painel.html">Painel da Contatos</a>
+      </div>
+    </nav>
+
+    <div class="container">
+      <h2 class="text-center mb-4 text-danger">Contatos Recebidos</h2>
+      <div id="contatosContainer"></div>
+    </div>
+
+    <footer>
+      <p>&copy; 2025 Confeitaria. Todos os direitos reservados.</p>
+    </footer>
+
+    <script src="./api.js"></script>
+    <script>
+      const token = localStorage.getItem("Token");
+      fetch(`${API}/contatos`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            const container = document.getElementById("contatosContainer");
+            data.values.forEach((contato) => {
+              const card = document.createElement("div");
+              card.className = "card";
+              card.innerHTML = `
+                    <div class="card-body">
+                      <h5 class="card-title">${contato.Nome}</h5>
+                      <h6 class="card-subtitle mb-2 text-muted">${contato.Assunto}</h6>
+                      <p class="card-text">${contato.Texto}</p>
+                    </div>
+                  `;
+              container.appendChild(card);
+            });
+          } else {
+            alert("Erro ao carregar os contatos.");
+          }
+        })
+        .catch(() => {
+          alert("Erro de conexão com o servidor.");
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
